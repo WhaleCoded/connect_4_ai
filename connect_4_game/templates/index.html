@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='styles/index.css') }}">
+<script src="{{url_for('static', filename='js/index.js')}}"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+
+<div id="header" style="top: 0">
+    <button id="new_game" onclick="reset_board()">New Game</button>
+</div>
+
+<break></break>
+
+<div id="board_background">
+    <div id="board">
+        {%for col_index in range(width)%}
+        {%for row_index in range(height)%}
+
+        <div class="dot" id="entry{{col_index}}_{{row_index}}" name="{{col_index}}_{{row_index}}"
+            onclick="make_player_move({{col_index}})"></div>
+        {%endfor%}
+        {%endfor%}
+    </div>
+</div>
