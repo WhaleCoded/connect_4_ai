@@ -13,6 +13,10 @@ AI_VALUE = 1
 CURR_BOARD = np.zeros((BOARD_WIDTH, BOARD_HEIGHT))
 MODEL_PATH = "/home/dallin/byu/fall_2022/machine_learning/connect_4/deep_learning/model_6_0_3_12.pt"
 MODEL = get_and_load_model(MODEL_PATH)
+AI_FIRST = False
+
+if AI_FIRST:
+    CURR_BOARD[3, 0] = AI_VALUE
 
 app = Flask(__name__)
 
@@ -37,7 +41,9 @@ def check_for_tie():
 
 @app.route("/")
 def index():
-    return render_template("index.html", width=BOARD_WIDTH, height=BOARD_HEIGHT)
+    return render_template(
+        "index.html", width=BOARD_WIDTH, height=BOARD_HEIGHT, ai_first=AI_FIRST
+    )
 
 
 @app.route("/reset_board", methods=["POST"])
@@ -74,13 +80,25 @@ def make_move():
                 CURR_BOARD.reshape(1, 1, BOARD_WIDTH, BOARD_HEIGHT)
             ).float()
             results = MODEL(transformed_data)
-            ai_move = int(torch.argmax(results))
+            ai_col_scores = {}
+            for i, pred in enumerate(results[0]):
+                ai_col_scores[i] = pred.item()
+            ai_col_scores = sorted(
+                ai_col_scores.items(), key=lambda item: item[1], reverse=True
+            )
 
-            for row_index in range(BOARD_HEIGHT):
-                if CURR_BOARD[ai_move, row_index] == 0:
-                    CURR_BOARD[ai_move, row_index] = AI_VALUE
-                    ai_move = (ai_move, row_index)
-                    break
+            selection_indx = 0
+            while ai_move is None:
+                ai_selection = ai_col_scores[selection_indx][0]
+                # ai_selection = int(torch.argmax(results))
+
+                for row_index in range(BOARD_HEIGHT):
+                    if CURR_BOARD[ai_selection, row_index] == 0:
+                        CURR_BOARD[ai_selection, row_index] = AI_VALUE
+                        ai_move = (ai_selection, row_index)
+                        break
+
+                selection_indx += 1
 
         if player_move is None and ai_move is None:
             return

@@ -14,8 +14,13 @@
         {%for col_index in range(width)%}
         {%for row_index in range(height)%}
 
+        {% if col_index == 3 and row_index == 0 and ai_first %}
+        <div class="dot" id="entry{{col_index}}_{{row_index}}" name="{{col_index}}_{{row_index}}"
+            onclick="make_player_move({{col_index}})" style="background-color: #E9E124;"></div>
+        {% else %}
         <div class="dot" id="entry{{col_index}}_{{row_index}}" name="{{col_index}}_{{row_index}}"
             onclick="make_player_move({{col_index}})"></div>
+        {% endif %}
         {%endfor%}
         {%endfor%}
     </div>
